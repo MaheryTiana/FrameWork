@@ -10,7 +10,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import tools.Tools;
+import utilitaire.Utilitaire;
 
 /**
  *
@@ -30,7 +30,7 @@ public class Frontservlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response,String url)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        Tools fun = new Tools();
+        Utilitaire fun = new Utilitaire();
         String ans = fun.getUrl(url,request.getContextPath() );
         try (PrintWriter out = response.getWriter()) {
             /* TODO output your page here. You may use following sample code. */
