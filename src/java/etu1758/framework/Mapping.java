@@ -10,7 +10,7 @@ package etu1758.framework;
  */
 public class Mapping {
     String className;
-    String method;
+    String Method;
 
     public String getClassName() {
         return className;
@@ -21,10 +21,12 @@ public class Mapping {
     }
 
     public String getMethod() {
-        return method;
+        return Method;
     }
 
-    public void setMethod(String method) {
-        this.method = method;
+    public void setMethod(String Method) {
+        this.Method = Method;
     }
+    
+    
 }

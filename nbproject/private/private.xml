@@ -2,6 +2,12 @@
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-        <group/>
+        <group>
+            <file>file:/home/mahery/fianarana/webDyn/framework/src/java/Model/Dept.java</file>
+            <file>file:/home/mahery/fianarana/webDyn/framework/src/java/annotation/Annotation.java</file>
+            <file>file:/home/mahery/fianarana/webDyn/framework/src/java/utilitaire/Utilitaire.java</file>
+            <file>file:/home/mahery/fianarana/webDyn/framework/src/java/etu1758/framework/Mapping.java</file>
+            <file>file:/home/mahery/fianarana/webDyn/framework/src/java/etu1758/framework/servlet/Frontservlet.java</file>
+        </group>
     </open-files>
 </project-private>
