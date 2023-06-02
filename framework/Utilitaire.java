@@ -17,13 +17,13 @@ public class Utilitaire {
     public Utilitaire() {
     }
     
-    public String getUrl(String allURL,String contextPath )
+    public String[] getUrl(String allURL,String contextPath )
     {
         String[] sub = allURL.split(contextPath);
         String[] sub2 = sub[1].split("/",2);
         String url =sub2[1];
         
-        return url;
+        return url.split("/");
     }
     
     //packageUrl:chemin absolue du package

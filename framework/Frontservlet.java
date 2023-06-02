@@ -15,6 +15,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
+
 import annotation.Annotation;
 import etu1758.framework.Mapping;
 import java.util.Map;
@@ -62,7 +67,7 @@ public class Frontservlet extends HttpServlet {
                     for (Method m : method) {
                         System.out.println("method:: "+m.getName());
                         if (m.isAnnotationPresent(Url.class)) {
-                            System.out.println("annotation is present,class ::"+c.getName());
+                            System.out.println("annotation present,class ::"+c.getName());
                             Url urlMapping=(Url)m.getAnnotation(Url.class);
                             Mapping mapping = new Mapping();
                             mapping.setClassName(c.getName());
@@ -92,16 +97,21 @@ public class Frontservlet extends HttpServlet {
         Utilitaire fun = new Utilitaire();
         String path = Frontservlet.class.getClassLoader().getResource("").getPath();
         PrintWriter out = response.getWriter(); 
-        //String ans = fun.getUrl(url,request.getContextPath() );
+        String[] ans = fun.getUrl(url,request.getContextPath() );
+        for (String a : ans) {
+            
+            out.println("ans :: "+a);
+        }
         File files=new File(path);
         File[] dir=files.listFiles();
       //  for (File pack : dir) {
             try{
           
                 for (Map.Entry<String, Mapping> entry : MappingUrls.entrySet()) {
-             
-                    out.println("hashmap:: "+entry.getKey()+" // "+entry.toString());
-                    
+                    if (entry.getKey().equals(ans[0])) {
+                        out.println("hashmap:: "+entry.getKey()+" // "+entry.toString());
+                    }
+                
                 }
             }
             catch (Exception e) {
