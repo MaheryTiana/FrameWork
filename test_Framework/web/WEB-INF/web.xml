@@ -6,7 +6,7 @@
     </servlet>
     <servlet-mapping>
         <servlet-name>Frontservlet</servlet-name>
-        <url-pattern>/</url-pattern>
+        <url-pattern>/go/*</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
