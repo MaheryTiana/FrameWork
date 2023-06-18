@@ -51,8 +51,7 @@ public class Utilitaire {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("Erreur: Utils getClassesDansDossiers(File dossier, String nomDePackage)");
-            // TODO: handle exception
+         // TODO: handle exception
         }
         return classes;
     }
@@ -77,8 +76,7 @@ public class Utilitaire {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("Erreur: Utils avoirLesClasses(String packageScannés)");
-            // TODO: handle exception
+        // TODO: handle exception
         }
         return classes;
     }
@@ -101,8 +99,7 @@ public class Utilitaire {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("Erreur: Utils avoirLesMethodesAnnotees(String nomDePackage, Class<? extends Annotation> annotationDeClasse)");
-            // TODO: handle exception
+          // TODO: handle exception
         }
         return methodesAnnotees;
     }
