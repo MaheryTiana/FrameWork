@@ -1,4 +1,4 @@
-<%@page import="etu1758.framework.*, Model.Emp, java.util.*"%>
+<%@page import="etu1758.framework.*, model.Emp"%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,20 +9,20 @@
 </head>
 <body>
     <h1>LISTE EMPLOYES</h1>
-    <% List<Emp> emp = (List<Emp>) request.getAttribute("allEmploye"); %>
+    <% Emp emp = (Emp) request.getAttribute("employer"); %>
     <table>
         <thead>
+            <td>Id</td>
             <td>Nom</td>
             <td>Prenom</td>
+            <td>Date</td>
         </thead>
-        <% for(int i = 0; i < emp.size(); i++){ %>
             <tbody>
-                <td> <%= emp.get(i).getId() %> </td>
-                <td> <%= emp.get(i).getNom() %> </td>
-                <td> <%= emp.get(i).getPrenom() %> </td>
-                <td> <%= emp.get(i).getDate_de_naissance() %> </td>
+                <td> <%= emp.getId() %> </td>
+                <td> <%= emp.getNom() %> </td>
+                <td> <%= emp.getPrenom() %> </td>
+                <td> <%= emp.getDate_de_naissance() %> </td>
             </tbody>
-        <% } %>
     </table>
 </body>
 </html>

@@ -5,6 +5,8 @@
 package utilitaire;
 
 import etu1758.framework.servlet.Frontservlet;
+import etu1767.framework.ModelView;
+import etu1767.framework.Url;
 import etu1758.framework.Mapping;
 import java.io.File;
 import java.util.Vector;
@@ -16,6 +18,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -26,6 +29,24 @@ import java.util.Map;
  * @author mahery
  */
 public class Utilitaire {
+
+
+    public static Object cast(String toCast, Class typeOfCast) throws Exception {
+        if (typeOfCast == int.class || typeOfCast == Integer.class) {
+            return Integer.parseInt(toCast);
+        } else if (typeOfCast == double.class || typeOfCast == Double.class) {
+            return Double.parseDouble(toCast);
+        } else if (typeOfCast == Date.class) {
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+            java.util.Date utilDate = format.parse(toCast);
+            return new java.sql.Date(utilDate.getTime());
+        } else if (typeOfCast == Boolean.class) {
+            return Boolean.parseBoolean(toCast);
+        }
+    
+        return toCast;
+    }
+
     //Obtenir toutes les classes dans chaque dossier
     private static List<Class<?>> getClassesDansDossiers(File dossier, String nomDePackage)throws Exception{
         //System.out.println(dossier.getAbsolutePath() + " PATH");
