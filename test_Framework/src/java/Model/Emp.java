@@ -5,7 +5,7 @@
 package Model;
 
 import annotation.Annotation;
-
+import utilitaire.Url;
 /**
  *
  * @author mahery
@@ -15,7 +15,7 @@ public class Emp {
     public Emp() {
     }
     
-    @Annotation(met = "Emp-all")
+    @Url(url="get-all")
     public void getAll(){
     }
 }

@@ -4,8 +4,8 @@ javac -d build *.java
 cd build
 jar -cf framework.jar .
 
-cp framework.jar ../../testFramework/build/web/WEB-INF/lib/framework.jar
+cp framework.jar ../../test_Framework/build/web/WEB-INF/lib/framework.jar
 
-cd ../../testFramework/build/web/
+cd ../../test_Framework/build/web/
 
-jar -cf /home/mahery/fianarana/tomcat/webapps/testFramework.war .
+jar -cf /home/mahery/fianarana/tomcat/webapps/test_Framework.war .
