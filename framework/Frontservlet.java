@@ -4,7 +4,15 @@
  */
 package etu1758.framework.servlet;
 
-import java.io.File;
+import java.io.*;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
+import java.net.http.HttpRequest;
+import java.nio.file.Path;
+import javax.servlet.annotation.MultipartConfig;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Method;
@@ -27,7 +35,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 
 import annotation.Annotation;
-import etu1758.framework.Mapping;
+import etu1758.framework.*;
 
 import java.util.Map;
 import java.util.List;
@@ -39,10 +47,11 @@ import Model.*;
  *
  * @author mahery
  */
+
+@MultipartConfig
 public class Frontservlet extends HttpServlet {
     HashMap<String, Mapping> mappingUrls;
     String nomDePackage;
-
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
@@ -51,6 +60,7 @@ public class Frontservlet extends HttpServlet {
             // entrySet -> ampiasaina ao am boucle angalana an le clef sy valeur
             out.println("You are being redirected to FRONTsERVLET");
 
+            
             Mapping map = this.getMapping(request);
             Object obj = Class.forName(map.getClassName()).newInstance();
             sendData(request, obj);
@@ -79,6 +89,7 @@ public class Frontservlet extends HttpServlet {
             // out.println(donneesJSP.toString() + " donneesJSP");
             for (String parameterName : donneesJSP.keySet()) {
                 String[] values = donneesJSP.get(parameterName);
+                // out.println(parameterName + " : " + String.join(", ", values));
                 modelView.addItem(parameterName, donneesJSP.get(parameterName)[0]);
             }
         } else {
@@ -92,14 +103,51 @@ public class Frontservlet extends HttpServlet {
     public void sendData(HttpServletRequest request, Object obj) throws Exception {
         Field[] fields = obj.getClass().getDeclaredFields();
         for (Field field : fields) {
-            String value = request.getParameter(field.getName());
+            field.setAccessible(true);
+            String value = field.getName();
+            if(multiPartFormDataContentType(request)){
             if (value != null) {
-                field.setAccessible(true);
-                Class castValue = (Class<?>) field.getType();
-                field.set(obj, Utilitaire.cast(value, castValue));
+                    System.out.println("TSY NULLLL" + value + " ITOO" + obj.getClass());
+                    if(field.getType().getSimpleName().equalsIgnoreCase("FileUpload") == true){
+                        System.out.println("THERE IS A FILE TO UPLOAD");
+                        try {
+                            System.out.println("THERE IS A FILE TO UPLOAD TAFIDITRAAAAAAAAAAAA");
+                            Part filePart=request.getPart(value);
+                            FileUpload upload=new FileUpload();
+                            upload.setFileName(filePart.getSubmittedFileName()); 
+                            InputStream inputStream = filePart.getInputStream();
+                            upload.setData(inputStream.readAllBytes());
+                            System.out.println(upload.getData());
+                            Class<?> clazz = obj.getClass();
+                            // Retrieve the PathUploadClass annotation from the class
+                            PathUpload annotation = clazz.getAnnotation(PathUpload.class);
+                            if (annotation != null) {
+                                String filePath = annotation.filePath();
+                                Utilitaire.uploadFile(upload, filePath, value, request);
+                            }else{
+                                System.out.println("Aucune annotation donnée à PathUpload");
+                            }
+                        } catch (Exception e) {
+                            throw new Exception("Verifier si vous avez bien télécharger quelque chose");
+                        }
+                    }else{
+                        System.out.println("THIS IS NOT A FILE TO UPLOAD" + value);
+                        String valeur = request.getParameter(field.getName());
+                        Class castValue = (Class<?>) field.getType();
+                        field.set(obj, Utilitaire.cast(valeur, castValue));
+                    }
+                }
             }
         }
     }
+
+public static boolean multiPartFormDataContentType(HttpServletRequest request){
+    String contentType = request.getContentType();
+    if(contentType != null && contentType.startsWith("multipart/form-data")){
+        return true;
+    }
+    return false;
+}
 
     public String[] avoirLaListeArguments(Method methodCalled) {
         String[] thoseAre = null;
@@ -122,7 +170,6 @@ public class Frontservlet extends HttpServlet {
             String clef = entry.getKey();
             String method = entry.getValue().getMethod();
             if (path[1].compareToIgnoreCase(clef) == 0) {
-                System.out.println(entry.getValue() + " - " + entry.getValue().getMethod());
                 return entry.getValue();
             }
         }
@@ -140,10 +187,9 @@ public class Frontservlet extends HttpServlet {
             Class typeArguments = parameters[i].getType();
             // Avadika string le valeur an le paramètre tany am le méthode
             String value = request.getParameter(listeArguments[i]);
-            System.out.println(parameters[i].getName() + " parameters[i].getName()");
+            System.out.println(typeArguments + " parameters[i].getClass().getSimpleName()parameters[i].getClass().getSimpleName()");
             // Avadika ho le type originaleny amzay le izy aveo
             argumentsDeMethode[i] = Utilitaire.cast(value, typeArguments);
-            System.out.println(argumentsDeMethode[i] + " argumentsDeMethode[i]");
         }
         return argumentsDeMethode;
     }
@@ -201,6 +247,5 @@ public class Frontservlet extends HttpServlet {
     public void setNomDePackage(String nomDePackage) {
         this.nomDePackage = nomDePackage;
     }
-
 
 }
