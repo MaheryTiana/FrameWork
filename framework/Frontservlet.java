@@ -10,10 +10,9 @@ import java.io.PrintWriter;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Vector;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import javax.servlet.*;
+import javax.servlet.http.*;
+import javax.swing.text.Utilities;
 import javax.servlet.annotation.WebServlet;
 
 import java.lang.reflect.Constructor;
@@ -28,7 +27,7 @@ import java.util.List;
 import utilitaire.Url;
 import utilitaire.ModelView;
 import utilitaire.Utilitaire;
-// import Model.*;
+import Model.*;
 /**
  *
  * @author mahery
@@ -49,6 +48,18 @@ public class Frontservlet extends HttpServlet {
             RequestDispatcher dispat = request.getRequestDispatcher(modelView.getVueRedirection());
 
             HashMap<String, Object> data = modelView.getData();                                    // Get all data of the mv
+            Map<String, String[]> donneesJSP;
+            if (request.getParameterMap()!=null && !request.getParameterMap().isEmpty()) {
+                donneesJSP = request.getParameterMap();
+
+                out.println(donneesJSP.toString() + " donneesJSP");
+                for (String parameterName : donneesJSP.keySet()) {
+                    String[] values = donneesJSP.get(parameterName);
+                    out.println(parameterName + " : " + String.join(", ", values));
+                    request.setAttribute(parameterName,donneesJSP.get(parameterName)[0]);
+                    //get.("NOM ATTRIBUT")[0] du parametre pour recuperer les donnees
+                } 
+            }
 
             if(data != null){
                 for (Map.Entry<String, Object> entry : data.entrySet()) {
