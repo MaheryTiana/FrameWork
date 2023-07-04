@@ -10,23 +10,22 @@ package etu1758.framework;
  */
 public class Mapping {
     String className;
-    String Method;
-
+    String method;
+    public Mapping(String className, String method) {
+        this.className = className;
+        this.method = method;
+    }
     public String getClassName() {
         return className;
     }
-
     public void setClassName(String className) {
         this.className = className;
     }
-
     public String getMethod() {
-        return Method;
+        return method;
     }
-
-    public void setMethod(String Method) {
-        this.Method = Method;
-    }
-    
+    public void setMethod(String method) {
+        this.method = method;
+    } 
     
 }

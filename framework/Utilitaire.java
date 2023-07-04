@@ -5,76 +5,136 @@
 package utilitaire;
 
 import etu1758.framework.servlet.Frontservlet;
+import etu1758.framework.Mapping;
 import java.io.File;
 import java.util.Vector;
-
+import java.io.IOException;
+import javax.servlet.*;
+import javax.servlet.http.*;
+import java.io.File;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 /**
  *
  * @author mahery
  */
 public class Utilitaire {
-
-    public Utilitaire() {
-    }
-    
-    public String[] getUrl(String allURL,String contextPath )
-    {
-        String[] sub = allURL.split(contextPath);
-        String[] sub2 = sub[1].split("/",2);
-        String url =sub2[1];
-        
-        return url.split("/");
-    }
-    
-    //packageUrl:chemin absolue du package
-     // packageName:nom du package
-    
-    
-    public Vector<Class> getAllClassInPackage(String packageUrl, String packageName)throws Exception{   
-        File file = new File(packageUrl);
-        File[] filesIn = file.listFiles();
-        Vector<Class> allClass = new Vector<Class>();
-        for(File fl : filesIn){
-            if (fl.isDirectory() == true) {
-
-                String pathFl = packageUrl +"/"+fl.getName();
-    //ity ilay blem
-                if (packageUrl.endsWith("/") == true) {
-                    pathFl = packageUrl +fl.getName();
-                }
-                System.out.println("pathFl:: "+pathFl);
-               Vector<Class> classTemp = getAllClassInPackage(pathFl, packageName);
-               for(Class c : classTemp){
-                   System.out.println("add class ::"+c.getName());
-                   allClass.add(c);
-                }
-
-
+    //Obtenir toutes les classes dans chaque dossier
+    private static List<Class<?>> getClassesDansDossiers(File dossier, String nomDePackage)throws Exception{
+        //System.out.println(dossier.getAbsolutePath() + " PATH");
+        List<Class<?>> classes = new ArrayList<>();
+        if(dossier.getAbsolutePath().toString().contains("%20")){
+            dossier = new File(dossier.getAbsolutePath().toString().replace("%20", " "));
+        }
+        //System.out.println(dossier.getAbsolutePath() + " PATH 2");
+        try {
+            if(!dossier.exists()){
+                return classes;
             }else{
-                
-                if (fl.getName().endsWith(".class") == true) {
-                    String pathClass = packageName;
-                    
-                    if (packageUrl.substring(packageUrl.lastIndexOf("/")+1).equals(packageName) == true) {
-                    System.out.println("package :: "+packageUrl.substring(packageUrl.lastIndexOf("/")+1)+"== "+packageName);
-     
-                    pathClass = packageUrl.substring(packageUrl.indexOf(packageName));
-                    pathClass = pathClass.replace("/", ".");
-                    String urlClass = pathClass+"."+fl.getName().substring(0,fl.getName().lastIndexOf(".class"));
-                    System.out.println("urlClass :: "+urlClass);
-                    Class c = Class.forName(urlClass);
-                    System.out.println("else :: add class ::: "+c.getName());
-                    allClass.add(c);
+                    File[] fichiersDansDossier = dossier.listFiles();
+                    for (File fichier : fichiersDansDossier) {
+                        if(fichier.isDirectory()){
+                            assert !fichier.getName().contains(".");
+                            classes.addAll(getClassesDansDossiers(fichier, nomDePackage + "." + fichier.getName()));
+                        }else if(fichier.getName().endsWith(".class") == true){
+                            String nomDeClasse = nomDePackage + "." + fichier.getName().substring(0, fichier.getName().length()-6);
+                            classes.add(Class.forName(nomDeClasse));
+                        }
                     }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Erreur: Utils getClassesDansDossiers(File dossier, String nomDePackage)");
+            // TODO: handle exception
+        }
+        return classes;
+    }
+    
+    //Avoir toutes les classes dans un package spécifié
+    private static List<Class<?>> getLesClasses(String packageScannes) throws Exception{
+        //System.out.println(" packageScannes : " + packageScannes);
+        List<Class<?>> classes = new ArrayList<>();
+        try {
+            ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+            String chemin = packageScannes.replace('.', '/');
+            Enumeration<URL> ressources = classLoader.getResources(chemin);
+            //System.out.println(ressources.nextElement().getFile());
+            List<File> dossiers = new ArrayList<>();
+            while(ressources.hasMoreElements()){
+                URL ressource = ressources.nextElement();
+                dossiers.add(new File(ressource.getFile()));
+            }
+            // System.out.println(dossiers.size());
+            for (File dossier : dossiers) {
+                classes.addAll(getClassesDansDossiers(dossier, packageScannes));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Erreur: Utils avoirLesClasses(String packageScannés)");
+            // TODO: handle exception
+        }
+        return classes;
+    }
 
+    public static HashMap<String, Mapping> getMethodesAnnotees(String nomDePackage, Class<? extends Annotation> annotationDeClasse) throws Exception{
+        HashMap<String, Mapping> methodesAnnotees = new HashMap<String, Mapping>();
+        try {
+            List<Class<?>> classes = getLesClasses(nomDePackage);
+            for (Class<?> class1 : classes) {
+                Method[] listesMethodes = class1.getDeclaredMethods();
+                for (Method methode : listesMethodes) {
+                    Annotation annotation = methode.getAnnotation(annotationDeClasse);
+                    if(annotation != null){/* 
+                        System.out.println("methode " + ((Url) annotation).method());
+                        System.out.println("nomdeclasse " + class1.getName());
+                        System.out.println("nomdemethode " + methode.getName()); */
+                        methodesAnnotees.put(((Url) annotation).method(), new Mapping( class1.getName(), methode.getName()));
+                    }
                 }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Erreur: Utils avoirLesMethodesAnnotees(String nomDePackage, Class<? extends Annotation> annotationDeClasse)");
+            // TODO: handle exception
         }
-
-
-        return allClass;
+        return methodesAnnotees;
     }
     
+    
+    public static ModelView modelDeRedirection (HttpServletRequest request, HashMap<String, Mapping> mappingUrls)throws Exception, ServletException, IOException{
+        System.out.println(request.getServletPath() + " SERVLET PATH");
+        String servletPath = request.getServletPath();
+        String[] path = servletPath.split("/");
+        ModelView modelView = new ModelView();
+            for (Map.Entry<String, Mapping> entry : mappingUrls.entrySet()) {
+                String clef = entry.getKey();// clef
+                Mapping map = entry.getValue(); // valeur
+                System.out.println(clef + " - " + map.getMethod().toString());
+                if(path[1].equals(clef) == true){
+                    String nomDeClasseDeMethode = mappingUrls.get(path[1]).getClassName();
+                    //Prendre la classe mère
+                    String laClasse = nomDeClasseDeMethode;
+                    System.out.println(laClasse + " LA CLASEEEEEEEEEEEEEEEE");
+                    //Prendre la méthode en string
+                    String laMethode = map.getMethod();
+                    System.out.println(laMethode + " LA METHODEEEEEEEEEEEEEEE");
+        
+                    //Invocation de la méthode
+                    Class<?> appel = Class.forName(laClasse);
+                    Object objectC = appel.getDeclaredConstructor().newInstance();
+                    modelView = (ModelView)appel.getDeclaredMethod(laMethode).invoke(objectC);
+                    return modelView;
+                }
+            }
+        return modelView;
+    }
 
 }
 
