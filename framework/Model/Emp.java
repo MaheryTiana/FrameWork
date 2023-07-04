@@ -12,10 +12,12 @@ import java.util.List;
 import utilitaire.ModelView;
 import annotation.Annotation;
 import utilitaire.Url;
+import etu1758.framework.*;
 /**
  *
  * @author mahery
  */
+@PathUpload(filePath = "/home/mahery/fianarana/tomcat/webapps/test_Framework/image")
 public class Emp {
     int id;
     String nom;
@@ -59,6 +61,14 @@ public class Emp {
         ModelView modelView = new ModelView("addEmp.jsp");
         return modelView;
     }
+    @Url(method = "add-emp-with-arguments.gg")
+    @Arguments(arguments = {"id", "nom", "prenom", "date_de_naissance" , "fileEmploye"})
+    public ModelView addEmployeWithArguments(int id, String nom, String prenom, Date date_de_naissance , FileUpload fileEmploye){
+        ModelView modelView = new ModelView("sprint8.jsp");
+        Employe employe = new Employe(id, nom, prenom, date_de_naissance , fileEmploye);
+        modelView.addItem("employer", employe); 
+        return modelView;
+    }
     public int getId() {
         return id;
     }
@@ -82,5 +92,11 @@ public class Emp {
     }
     public void setDate_de_naissance(Date date_de_naissance) {
         this.date_de_naissance = date_de_naissance;
+    }
+    public FileUpload getFileEmploye() {
+        return fileEmploye;
+    }
+    public void setFileEmploye(FileUpload fileEmploye) {
+        this.fileEmploye = fileEmploye;
     }
 }
