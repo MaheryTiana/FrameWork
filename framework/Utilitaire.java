@@ -4,6 +4,8 @@
  */
 package utilitaire;
 
+import java.io.*;
+import etu1758.framework.*;
 import etu1758.framework.servlet.Frontservlet;
 import etu1758.framework.Mapping;
 import java.io.File;
@@ -77,7 +79,7 @@ public class Utilitaire {
     }
     
     //Avoir toutes les classes dans un package spécifié
-    private static List<Class<?>> getLesClasses(String packageScannes) throws Exception{
+    public static List<Class<?>> getLesClasses(String packageScannes) throws Exception{
         //System.out.println(" packageScannes : " + packageScannes);
         List<Class<?>> classes = new ArrayList<>();
         try {
@@ -153,5 +155,42 @@ public class Utilitaire {
         return modelView;
     }
 
+        public static String majuscule(String s){
+        return s.substring(0,1).toUpperCase()+s.substring(1, s.length());
+    }
+
+    public static void uploadFile(FileUpload file, String pathName, String value, HttpServletRequest request) throws Exception {
+    // Get the filename from the file part
+    String fileName = file.getFileName();
+    
+    // Specify the directory to save the uploaded file
+    String savePath = pathName + "test_Framework-" + fileName;
+    
+    // Save the file to the specified location
+    OutputStream out = null;
+    InputStream fileContent = null;
+    try {
+        Part filePart=request.getPart(value);
+        out = new FileOutputStream(new File(savePath));
+        fileContent = filePart.getInputStream();
+        int read;
+        byte[] buffer = new byte[1024];
+        while ((read = fileContent.read(buffer)) != -1) {
+            out.write(buffer, 0, read);
+        }
+        out.flush();
+        out.close();
+    } catch (Exception e) {
+        e.printStackTrace();
+    } finally {
+        if (out != null) {
+            out.close();
+        }
+        if (fileContent != null) {
+            fileContent.close();
+        }
+    }
+    }
+    
 }
 
